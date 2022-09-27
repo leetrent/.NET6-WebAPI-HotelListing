@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HotelListing.Data.Config
 {
-    internal class HotelListingDBContext : DbContext
+    public class HotelListingDBContext : DbContext
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         // NOT NEEDED (SO FAR)
         //internal HotelListingDBContext(DbContextOptions<HotelListingDBContext> options): base(options) {}
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        internal DbSet<Country> Countries { get; set; }
-        internal DbSet<Hotel> Hotels { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<Hotel> Hotels { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -22,12 +22,12 @@ namespace HotelListing.Data.Config
             }
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new CountryConfig());
-            modelBuilder.ApplyConfiguration(new HotelConfig());
-        }
+        //    modelBuilder.ApplyConfiguration(new CountryConfig());
+        //    modelBuilder.ApplyConfiguration(new HotelConfig());
+        //}
     }
 }

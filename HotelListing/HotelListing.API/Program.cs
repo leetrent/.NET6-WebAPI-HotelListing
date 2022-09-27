@@ -1,3 +1,5 @@
+using HotelListing.Services;
+using HotelListing.Services.Interfaces;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
