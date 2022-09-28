@@ -33,7 +33,12 @@ namespace HotelListing.API.Controllers
         [HttpGet("{id:int}", Name = "GetCountry")]
         public async Task<ActionResult<Country>> GetCountry(int id)
         {
-            return Ok(await _service.RetrieveById(id));
+            Country foundCountry = await _service.RetrieveById(id);
+            if ( foundCountry == null)
+            {
+                return NotFound();
+            }
+            return Ok(foundCountry);
         }
 
 
