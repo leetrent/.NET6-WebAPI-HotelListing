@@ -9,10 +9,10 @@ namespace HotelListing.Services
     {
         private readonly ICountriesRepository _repository;
 
-        public CountriesService()
-        {
-            _repository = new CountriesRepository();
-        }
+        //public CountriesService()
+        //{
+        //    _repository = new CountriesRepository();
+        //}
         public CountriesService(ICountriesRepository repository)
         {
             _repository = repository;
@@ -32,5 +32,13 @@ namespace HotelListing.Services
         {
             return await _repository.RetrieveAll();
         }
+
+        public async Task<Country> Update(Country country)
+        {
+            Country updatedCountry = await _repository.Update(country);
+            Console.WriteLine($"[CountriesService][Update] => (updatedCountry): '{updatedCountry.Id}' / '{updatedCountry.ShortName}' / '{updatedCountry.Name}'");
+            return updatedCountry;
+        }
+
     }
 }

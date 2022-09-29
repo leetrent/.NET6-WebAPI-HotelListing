@@ -12,15 +12,10 @@ namespace HotelListing.API.Controllers
     {
         private readonly ICountriesService _service;
 
-        public CountriesController()
+        public CountriesController(ICountriesService service)
         {
-            _service = new CountriesService();
+            _service = service;
         }
-
-        //public CountriesController(ICountriesService service)
-        //{
-        //    _service = service;
-        //}
 
         // GET: api/Countries
         [HttpGet]
@@ -50,5 +45,28 @@ namespace HotelListing.API.Controllers
 
         }
 
+        // PUT: api/Countries/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutCountry(int id, Country country)
+        {
+            if (id != country.Id)
+            {
+                return BadRequest($"Record identifiers '{id}' and '{country.Id}' don't match.");
+            }
+
+            try
+            {
+                Country updatedCountry = await _service.Update(country);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[CountriesController][PutCountry] =>");
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine();
+                return Problem();
+            }
+        }
     }
 }

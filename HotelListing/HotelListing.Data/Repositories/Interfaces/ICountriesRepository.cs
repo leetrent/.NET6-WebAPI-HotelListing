@@ -11,5 +11,7 @@ namespace HotelListing.Data.Repositories.Interfaces
         Task<Country> Create(Country country);
         Task<Country> RetrieveById(int id);
         Task<List<Country>> RetrieveAll();
+
+        Task<Country> Update(Country country);
     }
 }
