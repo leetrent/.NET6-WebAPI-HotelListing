@@ -40,7 +40,7 @@ namespace HotelListing.Data.Repositories
             {
                 _dbContext.Entry(country).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
-                return country;
+                return await this.RetrieveById(country.Id);
             }
             else
             {
