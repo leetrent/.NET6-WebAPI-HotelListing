@@ -1,6 +1,7 @@
-﻿using HotelListing.Data;
-using HotelListing.Data.Repositories;
+﻿using AutoMapper;
+using HotelListing.Data;
 using HotelListing.Data.Repositories.Interfaces;
+using HotelListing.Services.DTOs;
 using HotelListing.Services.Interfaces;
 
 namespace HotelListing.Services
@@ -8,19 +9,19 @@ namespace HotelListing.Services
     public class CountriesService : ICountriesService
     {
         private readonly ICountriesRepository _repository;
+        private readonly IMapper _mapper;
 
-        //public CountriesService()
-        //{
-        //    _repository = new CountriesRepository();
-        //}
-        public CountriesService(ICountriesRepository repository)
+        public CountriesService(ICountriesRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
-        public async Task<Country> Create(Country country)
+        public async Task<CountryGetDTO> Create(CountryCreateDTO dto)
         {
-            return await _repository.Create(country);
+            Country entityToCreate = _mapper.Map<Country>(dto);
+            Country createdEntity = await _repository.Create(entityToCreate);
+            return _mapper.Map<CountryGetDTO>(createdEntity);
         }
 
         public async Task<Country> RetrieveById(int id)

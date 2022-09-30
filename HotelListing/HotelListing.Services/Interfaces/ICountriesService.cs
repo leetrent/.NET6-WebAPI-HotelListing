@@ -1,10 +1,11 @@
 ﻿using HotelListing.Data;
+using HotelListing.Services.DTOs;
 
 namespace HotelListing.Services.Interfaces
 {
     public interface ICountriesService
     {
-        Task<Country> Create(Country country);
+        Task<CountryGetDTO> Create(CountryCreateDTO dto);
         Task<Country> RetrieveById(int id);
         Task<List<Country>> RetrieveAll();
         Task<Country> Update(Country country);

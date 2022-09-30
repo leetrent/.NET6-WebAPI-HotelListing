@@ -1,5 +1,7 @@
-﻿using HotelListing.Data;
+﻿using AutoMapper;
+using HotelListing.Data;
 using HotelListing.Services;
+using HotelListing.Services.DTOs;
 using HotelListing.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,11 +13,11 @@ namespace HotelListing.API.Controllers
     public class CountriesController : ControllerBase
     {
         private readonly ICountriesService _service;
-
         public CountriesController(ICountriesService service)
         {
             _service = service;
         }
+
 
         // GET: api/Countries
         [HttpGet]
@@ -36,12 +38,22 @@ namespace HotelListing.API.Controllers
             return Ok(foundCountry);
         }
 
-
         [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(Country countryToAdd)
+        public async Task<ActionResult<Country>> PostCountry(CountryCreateDTO countryToAdd)
         {
-            Country newlyAddedCountry = await _service.Create(countryToAdd);
-            return CreatedAtAction("GetCountry", new { id = newlyAddedCountry.Id }, newlyAddedCountry);
+            try
+            {
+                CountryGetDTO newlyAddedCountry = await _service.Create(countryToAdd);
+                return CreatedAtAction("GetCountry", new { id = newlyAddedCountry.Id }, newlyAddedCountry);
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine("[CountriesController][PostCountry] =>");
+                Console.WriteLine(exc.Message);
+                Console.WriteLine(exc.StackTrace);
+                Console.WriteLine();
+                return Problem();
+            }
 
         }
 
@@ -60,10 +72,11 @@ namespace HotelListing.API.Controllers
                 Country updatedCountry = await _service.Update(country);
                 return NoContent();
             }
-            catch (Exception e)
+            catch (Exception exc)
             {
-                Console.WriteLine("[CountriesController][PutCountry] =>");
-                Console.WriteLine(e.StackTrace);
+                Console.WriteLine("[CountriesController][PostCountry] =>");
+                Console.WriteLine(exc.Message);
+                Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
                 return Problem();
             }
