@@ -13,5 +13,6 @@ namespace HotelListing.Data.Repositories.Interfaces
         Task<List<Country>> RetrieveAll();
 
         Task<Country> Update(Country country);
+        Task<int> Delete(int id);
     }
 }

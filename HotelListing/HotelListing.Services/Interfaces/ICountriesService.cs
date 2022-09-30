@@ -8,5 +8,6 @@ namespace HotelListing.Services.Interfaces
         Task<Country> RetrieveById(int id);
         Task<List<Country>> RetrieveAll();
         Task<Country> Update(Country country);
+        Task<int> Delete(int id);
     }
 }

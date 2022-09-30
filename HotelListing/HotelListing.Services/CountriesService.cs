@@ -40,5 +40,10 @@ namespace HotelListing.Services
             return updatedCountry;
         }
 
+        public async Task<int> Delete(int id)
+        {
+            return await _repository.Delete(id);
+        }
+
     }
 }

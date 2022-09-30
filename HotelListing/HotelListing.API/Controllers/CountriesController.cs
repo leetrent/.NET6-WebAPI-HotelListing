@@ -68,5 +68,23 @@ namespace HotelListing.API.Controllers
                 return Problem();
             }
         }
+
+        // DELETE: api/Countries/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCountry(int id)
+        {
+            try
+            {
+                await _service.Delete(id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[CountriesController][DeleteCountry] =>");
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine();
+                return Problem();
+            }
+        }
     }
 }

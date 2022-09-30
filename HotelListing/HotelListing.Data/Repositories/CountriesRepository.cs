@@ -48,6 +48,20 @@ namespace HotelListing.Data.Repositories
             }
         }
 
+        public async Task<int> Delete(int id)
+        {
+            if (await this.CountryExists(id) == true)
+            {
+                var country = await _dbContext.Countries.FindAsync(id);
+                _dbContext.Countries.Remove(country);
+                return await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception($"Country with an ID of '{id}' was not found. Cannot delete.");
+            }
+        }
+
         private async Task<bool> CountryExists(int id)
         {
             return await _dbContext.Countries.AnyAsync(e => e.Id == id);
