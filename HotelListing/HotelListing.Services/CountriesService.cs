@@ -17,21 +17,21 @@ namespace HotelListing.Services
             _mapper = mapper;
         }
 
-        public async Task<CountryGetDTO> Create(CountryCreateDTO dto)
+        public async Task<CountryDTO> Create(CountryCreateDTO dto)
         {
             Country entityToCreate = _mapper.Map<Country>(dto);
             Country createdEntity = await _repository.Create(entityToCreate);
-            return _mapper.Map<CountryGetDTO>(createdEntity);
+            return _mapper.Map<CountryDTO>(createdEntity);
         }
 
-        public async Task<Country> RetrieveById(int id)
+        public async Task<CountryDTO> RetrieveById(int id)
         {
-            return await _repository.RetrieveById(id);
+            return _mapper.Map<CountryDTO>(await _repository.RetrieveById(id));
         }
 
-        public async Task<List<Country>> RetrieveAll()
+        public async Task<List<CountryDTO>> RetrieveAll()
         {
-            return await _repository.RetrieveAll();
+            return _mapper.Map<List<CountryDTO>>(await _repository.RetrieveAll());
         }
 
         public async Task<Country> Update(Country country)

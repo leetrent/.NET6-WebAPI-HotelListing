@@ -5,9 +5,9 @@ namespace HotelListing.Services.Interfaces
 {
     public interface ICountriesService
     {
-        Task<CountryGetDTO> Create(CountryCreateDTO dto);
-        Task<Country> RetrieveById(int id);
-        Task<List<Country>> RetrieveAll();
+        Task<CountryDTO> Create(CountryCreateDTO dto);
+        Task<CountryDTO> RetrieveById(int id);
+        Task<List<CountryDTO>> RetrieveAll();
         Task<Country> Update(Country country);
         Task<int> Delete(int id);
     }

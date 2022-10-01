@@ -21,16 +21,16 @@ namespace HotelListing.API.Controllers
 
         // GET: api/Countries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
+        public async Task<ActionResult<IEnumerable<CountryDTO>>> GetCountries()
         {
             return Ok(await _service.RetrieveAll());
         }
 
         // GET: api/Countries/5
         [HttpGet("{id:int}", Name = "GetCountry")]
-        public async Task<ActionResult<Country>> GetCountry(int id)
+        public async Task<ActionResult<CountryDTO>> GetCountry(int id)
         {
-            Country foundCountry = await _service.RetrieveById(id);
+            CountryDTO foundCountry = await _service.RetrieveById(id);
             if ( foundCountry == null)
             {
                 return NotFound();
@@ -43,7 +43,7 @@ namespace HotelListing.API.Controllers
         {
             try
             {
-                CountryGetDTO newlyAddedCountry = await _service.Create(countryToAdd);
+                CountryDTO newlyAddedCountry = await _service.Create(countryToAdd);
                 return CreatedAtAction("GetCountry", new { id = newlyAddedCountry.Id }, newlyAddedCountry);
             }
             catch (Exception exc)
