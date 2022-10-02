@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace HotelListing.Services.DTOs
+namespace HotelListing.Services.DTOs.Country
 {
-    public class CountryCreateDTO
+    public class CountryBaseDTO
     {
         [Required]
         [Display(Name = "Country Name")]
@@ -20,7 +15,6 @@ namespace HotelListing.Services.DTOs
         [Display(Name = "Country Abbreviation")]
         [StringLength(3, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
         [RegularExpression(@"^[A-Z'\s]{1,40}$", ErrorMessage = "Only upper case characters are allowed.")]
-
         public string ShortName { get; set; } = String.Empty;
     }
 }

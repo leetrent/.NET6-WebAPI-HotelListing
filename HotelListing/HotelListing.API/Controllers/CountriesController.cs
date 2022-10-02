@@ -1,9 +1,5 @@
-﻿using AutoMapper;
-using HotelListing.Data;
-using HotelListing.Services;
-using HotelListing.Services.DTOs;
+﻿using HotelListing.Services.DTOs.Country;
 using HotelListing.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.API.Controllers
@@ -18,32 +14,54 @@ namespace HotelListing.API.Controllers
             _service = service;
         }
 
-
         // GET: api/Countries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CountryDTO>>> GetCountries()
+        public async Task<ActionResult<IEnumerable<CountryGetDTO>>> GetCountries()
         {
-            return Ok(await _service.RetrieveAll());
+            try
+            {
+                return Ok(await _service.RetrieveAll());
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine("[CountriesController][GetCountries] =>");
+                Console.WriteLine(exc.Message);
+                Console.WriteLine(exc.StackTrace);
+                Console.WriteLine();
+                return Problem();
+            }
         }
 
         // GET: api/Countries/5
         [HttpGet("{id:int}", Name = "GetCountry")]
-        public async Task<ActionResult<CountryDTO>> GetCountry(int id)
-        {
-            CountryDTO foundCountry = await _service.RetrieveById(id);
-            if ( foundCountry == null)
-            {
-                return NotFound();
-            }
-            return Ok(foundCountry);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(CountryCreateDTO countryToAdd)
+        public async Task<ActionResult<CountryGetDTO>> GetCountry(int id)
         {
             try
             {
-                CountryDTO newlyAddedCountry = await _service.Create(countryToAdd);
+                CountryGetDTO foundCountry = await _service.RetrieveById(id);
+                if (foundCountry == null)
+                {
+                    return NotFound();
+                }
+                return Ok(foundCountry);
+            }
+            catch (Exception exc)
+            {
+
+                Console.WriteLine("[CountriesController][GetCountry] =>");
+                Console.WriteLine(exc.Message);
+                Console.WriteLine(exc.StackTrace);
+                Console.WriteLine();
+                return Problem();
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<CountryGetDTO>> PostCountry(CountryCreateDTO countryToAdd)
+        {
+            try
+            {
+                CountryGetDTO newlyAddedCountry = await _service.Create(countryToAdd);
                 return CreatedAtAction("GetCountry", new { id = newlyAddedCountry.Id }, newlyAddedCountry);
             }
             catch (Exception exc)
@@ -60,21 +78,21 @@ namespace HotelListing.API.Controllers
         // PUT: api/Countries/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCountry(int id, Country country)
+        public async Task<IActionResult> PutCountry(int id, CountryUpdateDTO countryToUpdate)
         {
-            if (id != country.Id)
-            {
-                return BadRequest($"Record identifiers '{id}' and '{country.Id}' don't match.");
-            }
-
             try
             {
-                Country updatedCountry = await _service.Update(country);
+                if (id != countryToUpdate.Id)
+                {
+                    return BadRequest($"Record identifiers '{id}' and '{countryToUpdate.Id}' don't match.");
+                }
+
+                CountryGetDTO updatedCountry = await _service.Update(countryToUpdate);
                 return NoContent();
             }
             catch (Exception exc)
             {
-                Console.WriteLine("[CountriesController][PostCountry] =>");
+                Console.WriteLine("[CountriesController][PutCountry] =>");
                 Console.WriteLine(exc.Message);
                 Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
@@ -91,10 +109,11 @@ namespace HotelListing.API.Controllers
                 await _service.Delete(id);
                 return NoContent();
             }
-            catch (Exception e)
+            catch (Exception exc)
             {
                 Console.WriteLine("[CountriesController][DeleteCountry] =>");
-                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(exc.Message);
+                Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
                 return Problem();
             }

@@ -2,6 +2,7 @@
 using HotelListing.Data;
 using HotelListing.Data.Repositories.Interfaces;
 using HotelListing.Services.DTOs;
+using HotelListing.Services.DTOs.Country;
 using HotelListing.Services.Interfaces;
 
 namespace HotelListing.Services
@@ -17,28 +18,34 @@ namespace HotelListing.Services
             _mapper = mapper;
         }
 
-        public async Task<CountryDTO> Create(CountryCreateDTO dto)
+        public async Task<List<CountryGetDTO>> RetrieveAll()
+        {
+            return _mapper.Map<List<CountryGetDTO>>(await _repository.RetrieveAll());
+        }
+
+        public async Task<CountryGetDTO> RetrieveById(int id)
+        {
+            return _mapper.Map<CountryGetDTO>(await _repository.RetrieveById(id));
+        }
+
+        public async Task<CountryGetDTO> Create(CountryCreateDTO dto)
         {
             Country entityToCreate = _mapper.Map<Country>(dto);
-            Country createdEntity = await _repository.Create(entityToCreate);
-            return _mapper.Map<CountryDTO>(createdEntity);
+            int newCountryId = await _repository.Create(entityToCreate);
+
+            Console.WriteLine($"[CountriesService][Create] => (newCountryId): '{newCountryId}'");
+
+            return await this.RetrieveById(newCountryId);
         }
 
-        public async Task<CountryDTO> RetrieveById(int id)
+        public async Task<CountryGetDTO> Update(CountryUpdateDTO dto)
         {
-            return _mapper.Map<CountryDTO>(await _repository.RetrieveById(id));
-        }
+            Country entityToUpdate = _mapper.Map<Country>(dto);
+            int updatedCountryId = await _repository.Update(entityToUpdate);
 
-        public async Task<List<CountryDTO>> RetrieveAll()
-        {
-            return _mapper.Map<List<CountryDTO>>(await _repository.RetrieveAll());
-        }
+            Console.WriteLine($"[CountriesService][Update] => (updatedCountryId): '{updatedCountryId}'");
 
-        public async Task<Country> Update(Country country)
-        {
-            Country updatedCountry = await _repository.Update(country);
-            Console.WriteLine($"[CountriesService][Update] => (updatedCountry): '{updatedCountry.Id}' / '{updatedCountry.ShortName}' / '{updatedCountry.Name}'");
-            return updatedCountry;
+            return await this.RetrieveById(updatedCountryId);
         }
 
         public async Task<int> Delete(int id)
