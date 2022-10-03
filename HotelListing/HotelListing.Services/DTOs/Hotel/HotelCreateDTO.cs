@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace HotelListing.Services.DTOs.Hotel
 {
-    internal class HotelCreateDTO : HotelBaseDTO {}
+    public class HotelCreateDTO : HotelBaseDTO {}
 }

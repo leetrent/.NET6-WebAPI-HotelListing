@@ -15,9 +15,15 @@ builder.Services.AddDbContext<HotelListingDBContext>(options => {
     options.UseSqlServer(connectionString);
 });
 
-// Add services to the container.
+// ADD REPOSITORIES TO THE CONTAINER
 builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
+builder.Services.AddScoped<IHotelsRepository, HotelsRepository>();
+
+
+// ADD SERVICES TO THE CONTAINER
 builder.Services.AddScoped<ICountriesService, CountriesService>();
+builder.Services.AddScoped<IHotelsService, HotelsService>();
+
 
 
 builder.Services.AddControllers();
