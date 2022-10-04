@@ -64,7 +64,7 @@ namespace HotelListing.Data.Repositories
             }
         }
 
-        private async Task<bool> CountryExists(int id)
+        public async Task<bool> CountryExists(int id)
         {
             return await _dbContext.Countries.AnyAsync(e => e.Id == id);
         }

@@ -11,5 +11,6 @@ namespace HotelListing.Services.Interfaces
         Task<CountryGetDTO> Create(CountryCreateDTO dto);
         Task<CountryGetDTO> Update(CountryUpdateDTO dto);
         Task<int> Delete(int id);
+        Task<bool> CountryExists(int id);
     }
 }

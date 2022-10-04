@@ -9,5 +9,7 @@ namespace HotelListing.Services.Interfaces
         Task<HotelGetDTO> Create(HotelCreateDTO dto);
         Task<HotelGetDTO> Update(HotelUpdateDTO dto);
         Task<int> Delete(int id);
+        Task<bool> HotelExists(int id);
+        Task<bool> CountryExists(int id);
     }
 }

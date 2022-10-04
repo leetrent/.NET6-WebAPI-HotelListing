@@ -53,5 +53,9 @@ namespace HotelListing.Services
             return await _repository.Delete(id);
         }
 
+        public async Task<bool> CountryExists(int id)
+        {
+            return await _repository.CountryExists(id);
+        }
     }
 }

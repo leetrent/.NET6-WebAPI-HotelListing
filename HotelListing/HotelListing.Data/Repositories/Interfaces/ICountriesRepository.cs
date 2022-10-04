@@ -13,5 +13,7 @@ namespace HotelListing.Data.Repositories.Interfaces
         Task<int> Create(Country country);
         Task<int> Update(Country country);
         Task<int> Delete(int id);
+
+        Task<bool> CountryExists(int id);
     }
 }

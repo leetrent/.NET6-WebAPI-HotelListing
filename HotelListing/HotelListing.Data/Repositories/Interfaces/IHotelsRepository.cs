@@ -7,5 +7,7 @@
         Task<int> Create(Hotel hotel);
         Task<int> Update(Hotel hotel);
         Task<int> Delete(int id);
+        Task<bool> HotelExists(int id);
+        Task<bool> CountryExists(int id);
     }
 }

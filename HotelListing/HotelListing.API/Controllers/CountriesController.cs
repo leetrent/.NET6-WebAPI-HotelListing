@@ -24,8 +24,9 @@ namespace HotelListing.API.Controllers
             }
             catch (Exception exc)
             {
-                Console.WriteLine("[CountriesController][GetCountries] =>");
+                Console.WriteLine();
                 Console.WriteLine(exc.Message);
+                Console.WriteLine();
                 Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
                 return Problem();
@@ -48,8 +49,9 @@ namespace HotelListing.API.Controllers
             catch (Exception exc)
             {
 
-                Console.WriteLine("[CountriesController][GetCountry] =>");
+                Console.WriteLine();
                 Console.WriteLine(exc.Message);
+                Console.WriteLine();
                 Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
                 return Problem();
@@ -66,8 +68,9 @@ namespace HotelListing.API.Controllers
             }
             catch (Exception exc)
             {
-                Console.WriteLine("[CountriesController][PostCountry] =>");
+                Console.WriteLine();
                 Console.WriteLine(exc.Message);
+                Console.WriteLine();
                 Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
                 return Problem();
@@ -87,13 +90,19 @@ namespace HotelListing.API.Controllers
                     return BadRequest($"Record identifiers '{id}' and '{countryToUpdate.Id}' don't match.");
                 }
 
+                if ( await _service.CountryExists(countryToUpdate.Id) == false)
+                {
+                    return NotFound($"Country with ID '{countryToUpdate.Id}' not found. Cannot update.");
+                }
+
                 CountryGetDTO updatedCountry = await _service.Update(countryToUpdate);
                 return NoContent();
             }
             catch (Exception exc)
             {
-                Console.WriteLine("[CountriesController][PutCountry] =>");
+                Console.WriteLine();
                 Console.WriteLine(exc.Message);
+                Console.WriteLine();
                 Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
                 return Problem();
@@ -106,13 +115,19 @@ namespace HotelListing.API.Controllers
         {
             try
             {
+                if (await _service.CountryExists(id) == false)
+                {
+                    return NotFound($"Country with ID '{id}' not found. Cannot delete.");
+                }
+
                 await _service.Delete(id);
                 return NoContent();
             }
             catch (Exception exc)
             {
-                Console.WriteLine("[CountriesController][DeleteCountry] =>");
+                Console.WriteLine();
                 Console.WriteLine(exc.Message);
+                Console.WriteLine();
                 Console.WriteLine(exc.StackTrace);
                 Console.WriteLine();
                 return Problem();

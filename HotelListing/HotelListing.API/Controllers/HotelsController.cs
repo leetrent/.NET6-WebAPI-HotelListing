@@ -43,7 +43,7 @@ namespace HotelListing.API.Controllers
                 HotelGetDTO foundHotel = await _service.RetrieveById(id);
                 if (foundHotel == null)
                 {
-                    return NotFound();
+                    return NotFound($"Hotel with an ID of '{id}' was not found.");
                 }
                 return Ok(foundHotel);
             }
@@ -63,6 +63,11 @@ namespace HotelListing.API.Controllers
         {
             try
             {
+                if (await _service.CountryExists(hotelToAdd.CountryId) == false)
+                {
+                    return NotFound($"Country with ID '{hotelToAdd.CountryId}' was not found. Cannot create new hotel.");
+                }
+
                 HotelGetDTO newlyAddedHotel = await _service.Create(hotelToAdd);
                 return CreatedAtAction("GetHotel", new { id = newlyAddedHotel.Id }, newlyAddedHotel);
             }
@@ -87,7 +92,17 @@ namespace HotelListing.API.Controllers
             {
                 if (id != hotelToUpdate.Id)
                 {
-                    return BadRequest($"Record identifiers '{id}' and '{hotelToUpdate.Id}' don't match.");
+                    return BadRequest($"Record identifiers '{id}' and '{hotelToUpdate.Id}' don't match. Cannot update hotel.");
+                }
+
+                if (await _service.HotelExists(hotelToUpdate.Id) == false)
+                {
+                    return NotFound($"Hotel with ID '{hotelToUpdate.Id}' not found. Cannot update hotel.");
+                }
+
+                if (await _service.CountryExists(hotelToUpdate.CountryId) == false)
+                {
+                    return NotFound($"Country with ID '{hotelToUpdate.CountryId}' not found. Cannot update hotel.");
                 }
 
                 HotelGetDTO updatedHotel = await _service.Update(hotelToUpdate);
@@ -110,6 +125,11 @@ namespace HotelListing.API.Controllers
         {
             try
             {
+                if (await _service.HotelExists(id) == false)
+                {
+                    return NotFound($"Hotel with ID '{id}' not found. Cannot delete hotel.");
+                }
+
                 await _service.Delete(id);
                 return NoContent();
             }

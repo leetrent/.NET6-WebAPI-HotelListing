@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using HotelListing.Data;
 using HotelListing.Data.Repositories.Interfaces;
-using HotelListing.Services.DTOs;
-using HotelListing.Services.DTOs.Country;
 using HotelListing.Services.DTOs.Hotel;
 using HotelListing.Services.Interfaces;
 
@@ -48,6 +46,16 @@ namespace HotelListing.Services
         public async Task<int> Delete(int id)
         {
             return await _repository.Delete(id);
+        }
+
+        public async Task<bool> HotelExists(int id)
+        {
+            return await _repository.HotelExists(id);
+        }
+
+        public async Task<bool> CountryExists(int id)
+        {
+            return await _repository.CountryExists(id);
         }
 
     }

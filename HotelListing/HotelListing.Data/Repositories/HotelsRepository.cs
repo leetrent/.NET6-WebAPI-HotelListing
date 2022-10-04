@@ -39,7 +39,7 @@ namespace HotelListing.Data.Repositories
         }
         public async Task<int> Update(Hotel hotel)
         {
-            if (await this.HotelsExists(hotel.Id) == true)
+            if (await this.HotelExists(hotel.Id) == true)
             {
                 _dbContext.Entry(hotel).State = EntityState.Modified;
                 int rowsUpdated = await _dbContext.SaveChangesAsync();
@@ -54,7 +54,7 @@ namespace HotelListing.Data.Repositories
 
         public async Task<int> Delete(int id)
         {
-            if (await this.HotelsExists(id) == true)
+            if (await this.HotelExists(id) == true)
             {
                 Hotel hotel = await _dbContext.Hotels.FindAsync(id);
                 _dbContext.Hotels.Remove(hotel);
@@ -66,9 +66,14 @@ namespace HotelListing.Data.Repositories
             }
         }
 
-        private async Task<bool> HotelsExists(int id)
+        public async Task<bool> HotelExists(int id)
         {
             return await _dbContext.Hotels.AnyAsync(e => e.Id == id);
+        }
+
+        public async Task<bool> CountryExists(int id)
+        {
+            return await _dbContext.Countries.AnyAsync(e => e.Id == id);
         }
     }
 }
