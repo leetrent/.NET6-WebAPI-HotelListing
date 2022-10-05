@@ -42,7 +42,7 @@ namespace HotelListing.API.Controllers
                 CountryGetDTO foundCountry = await _service.RetrieveById(id);
                 if (foundCountry == null)
                 {
-                    return NotFound();
+                    return NotFound($"Country with an ID of '{id}' was not found.");
                 }
                 return Ok(foundCountry);
             }
@@ -92,7 +92,7 @@ namespace HotelListing.API.Controllers
 
                 if ( await _service.CountryExists(countryToUpdate.Id) == false)
                 {
-                    return NotFound($"Country with ID '{countryToUpdate.Id}' not found. Cannot update.");
+                    return NotFound($"Country with an ID '{countryToUpdate.Id}' was not found. Cannot update.");
                 }
 
                 CountryGetDTO updatedCountry = await _service.Update(countryToUpdate);
@@ -117,7 +117,12 @@ namespace HotelListing.API.Controllers
             {
                 if (await _service.CountryExists(id) == false)
                 {
-                    return NotFound($"Country with ID '{id}' not found. Cannot delete.");
+                    return NotFound($"Country with an ID of '{id}' was not found. Cannot delete.");
+                }
+
+                if (await _service.CountryHasHotels(id))
+                {
+                    return ValidationProblem($"Country with an ID of '{id}' contains hotels. Cannot delete.");
                 }
 
                 await _service.Delete(id);

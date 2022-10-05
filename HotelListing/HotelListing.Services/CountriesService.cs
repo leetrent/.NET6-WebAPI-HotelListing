@@ -57,5 +57,11 @@ namespace HotelListing.Services
         {
             return await _repository.CountryExists(id);
         }
+
+        public async Task<bool> CountryHasHotels(int id)
+        {
+            Country entity = await _repository.RetrieveById(id);
+            return entity.Hotels != null && entity.Hotels.Any();
+        }
     }
 }

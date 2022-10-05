@@ -65,7 +65,7 @@ namespace HotelListing.API.Controllers
             {
                 if (await _service.CountryExists(hotelToAdd.CountryId) == false)
                 {
-                    return NotFound($"Country with ID '{hotelToAdd.CountryId}' was not found. Cannot create new hotel.");
+                    return NotFound($"Country with an ID of '{hotelToAdd.CountryId}' was not found. Cannot create new hotel.");
                 }
 
                 HotelGetDTO newlyAddedHotel = await _service.Create(hotelToAdd);
@@ -97,12 +97,12 @@ namespace HotelListing.API.Controllers
 
                 if (await _service.HotelExists(hotelToUpdate.Id) == false)
                 {
-                    return NotFound($"Hotel with ID '{hotelToUpdate.Id}' not found. Cannot update hotel.");
+                    return NotFound($"Hotel with an ID '{hotelToUpdate.Id}' was not found. Cannot update hotel.");
                 }
 
                 if (await _service.CountryExists(hotelToUpdate.CountryId) == false)
                 {
-                    return NotFound($"Country with ID '{hotelToUpdate.CountryId}' not found. Cannot update hotel.");
+                    return NotFound($"Country with an ID '{hotelToUpdate.CountryId}' was not found. Cannot update hotel.");
                 }
 
                 HotelGetDTO updatedHotel = await _service.Update(hotelToUpdate);
@@ -127,7 +127,7 @@ namespace HotelListing.API.Controllers
             {
                 if (await _service.HotelExists(id) == false)
                 {
-                    return NotFound($"Hotel with ID '{id}' not found. Cannot delete hotel.");
+                    return NotFound($"Hotel with an ID '{id}' was not found. Cannot delete hotel.");
                 }
 
                 await _service.Delete(id);
