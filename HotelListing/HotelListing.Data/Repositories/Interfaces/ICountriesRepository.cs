@@ -8,11 +8,12 @@ namespace HotelListing.Data.Repositories.Interfaces
 {
     public interface ICountriesRepository
     {
-        Task<Country> Create(Country country);
-        Task<Country> RetrieveById(int id);
         Task<List<Country>> RetrieveAll();
-
-        Task<Country> Update(Country country);
+        Task<Country> RetrieveById(int id);
+        Task<int> Create(Country country);
+        Task<int> Update(Country country);
         Task<int> Delete(int id);
+
+        Task<bool> CountryExists(int id);
     }
 }

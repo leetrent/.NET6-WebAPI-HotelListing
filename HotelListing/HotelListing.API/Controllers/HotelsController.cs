@@ -1,4 +1,5 @@
 ﻿using HotelListing.Services.DTOs.Country;
+using HotelListing.Services.DTOs.Hotel;
 using HotelListing.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,17 +7,17 @@ namespace HotelListing.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CountriesController : ControllerBase
+    public class HotelsController : ControllerBase
     {
-        private readonly ICountriesService _service;
-        public CountriesController(ICountriesService service)
+        private readonly IHotelsService _service;
+        public HotelsController(IHotelsService service)
         {
             _service = service;
         }
 
-        // GET: api/Countries
+        // GET: api/Hotels
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CountryGetDTO>>> GetCountries()
+        public async Task<ActionResult<IEnumerable<HotelGetDTO>>> GetHotels()
         {
             try
             {
@@ -33,22 +34,21 @@ namespace HotelListing.API.Controllers
             }
         }
 
-        // GET: api/Countries/5
-        [HttpGet("{id:int}", Name = "GetCountry")]
-        public async Task<ActionResult<CountryGetDTO>> GetCountry(int id)
+        // GET: api/Hotels/5
+        [HttpGet("{id:int}", Name = "GetHotel")]
+        public async Task<ActionResult<HotelGetDTO>> GetHotel(int id)
         {
             try
             {
-                CountryGetDTO foundCountry = await _service.RetrieveById(id);
-                if (foundCountry == null)
+                HotelGetDTO foundHotel = await _service.RetrieveById(id);
+                if (foundHotel == null)
                 {
-                    return NotFound($"Country with an ID of '{id}' was not found.");
+                    return NotFound($"Hotel with an ID of '{id}' was not found.");
                 }
-                return Ok(foundCountry);
+                return Ok(foundHotel);
             }
             catch (Exception exc)
             {
-
                 Console.WriteLine();
                 Console.WriteLine(exc.Message);
                 Console.WriteLine();
@@ -59,12 +59,17 @@ namespace HotelListing.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CountryGetDTO>> PostCountry(CountryCreateDTO countryToAdd)
+        public async Task<ActionResult<HotelGetDTO>> PostHotel(HotelCreateDTO hotelToAdd)
         {
             try
             {
-                CountryGetDTO newlyAddedCountry = await _service.Create(countryToAdd);
-                return CreatedAtAction("GetCountry", new { id = newlyAddedCountry.Id }, newlyAddedCountry);
+                if (await _service.CountryExists(hotelToAdd.CountryId) == false)
+                {
+                    return NotFound($"Country with an ID of '{hotelToAdd.CountryId}' was not found. Cannot create new hotel.");
+                }
+
+                HotelGetDTO newlyAddedHotel = await _service.Create(hotelToAdd);
+                return CreatedAtAction("GetHotel", new { id = newlyAddedHotel.Id }, newlyAddedHotel);
             }
             catch (Exception exc)
             {
@@ -78,24 +83,29 @@ namespace HotelListing.API.Controllers
 
         }
 
-        // PUT: api/Countries/5
+        // PUT: api/Hotels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCountry(int id, CountryUpdateDTO countryToUpdate)
+        public async Task<IActionResult> PutHotel(int id, HotelUpdateDTO hotelToUpdate)
         {
             try
             {
-                if (id != countryToUpdate.Id)
+                if (id != hotelToUpdate.Id)
                 {
-                    return BadRequest($"Record identifiers '{id}' and '{countryToUpdate.Id}' don't match.");
+                    return BadRequest($"Record identifiers '{id}' and '{hotelToUpdate.Id}' don't match. Cannot update hotel.");
                 }
 
-                if ( await _service.CountryExists(countryToUpdate.Id) == false)
+                if (await _service.HotelExists(hotelToUpdate.Id) == false)
                 {
-                    return NotFound($"Country with an ID '{countryToUpdate.Id}' was not found. Cannot update.");
+                    return NotFound($"Hotel with an ID '{hotelToUpdate.Id}' was not found. Cannot update hotel.");
                 }
 
-                CountryGetDTO updatedCountry = await _service.Update(countryToUpdate);
+                if (await _service.CountryExists(hotelToUpdate.CountryId) == false)
+                {
+                    return NotFound($"Country with an ID '{hotelToUpdate.CountryId}' was not found. Cannot update hotel.");
+                }
+
+                HotelGetDTO updatedHotel = await _service.Update(hotelToUpdate);
                 return NoContent();
             }
             catch (Exception exc)
@@ -111,18 +121,13 @@ namespace HotelListing.API.Controllers
 
         // DELETE: api/Countries/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCountry(int id)
+        public async Task<IActionResult> DeleteHotel(int id)
         {
             try
             {
-                if (await _service.CountryExists(id) == false)
+                if (await _service.HotelExists(id) == false)
                 {
-                    return NotFound($"Country with an ID of '{id}' was not found. Cannot delete.");
-                }
-
-                if (await _service.CountryHasHotels(id))
-                {
-                    return ValidationProblem($"Country with an ID of '{id}' contains hotels. Cannot delete.");
+                    return NotFound($"Hotel with an ID '{id}' was not found. Cannot delete hotel.");
                 }
 
                 await _service.Delete(id);

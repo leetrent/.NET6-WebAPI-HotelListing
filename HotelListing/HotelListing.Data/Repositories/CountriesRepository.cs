@@ -8,39 +8,41 @@ namespace HotelListing.Data.Repositories
     {
         private readonly HotelListingDBContext _dbContext;
 
-        //public CountriesRepository()
-        //{
-        //    _dbContext = new HotelListingDBContext();
-        //}
         public CountriesRepository(HotelListingDBContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<Country> Create(Country country)
+        public async Task<List<Country>> RetrieveAll()
         {
-            _dbContext.Countries.Add(country);
-            await _dbContext.SaveChangesAsync();
-            return country;
+            return await _dbContext.Countries.AsNoTracking().Include(c => c.Hotels).ToListAsync();
         }
 
         public async Task<Country> RetrieveById(int id)
         {
-            return await _dbContext.Countries.AsNoTracking().Where( c => c.Id == id).FirstOrDefaultAsync();
+            return await _dbContext.Countries.AsNoTracking().Where(c => c.Id == id).Include(c => c.Hotels).FirstOrDefaultAsync();
         }
 
-        public async Task<List<Country>> RetrieveAll()
+        public async Task<int> Create(Country country)
         {
-            return await _dbContext.Countries.AsNoTracking().ToListAsync();
+            _dbContext.Countries.Add(country);
+            int rowsCreated = await _dbContext.SaveChangesAsync();
+
+            Console.WriteLine($"[CountriesRepository][Create] => (rowsCreated): '{rowsCreated}'");
+
+            return country.Id;
         }
 
-        public async Task<Country> Update(Country country)
+        public async Task<int> Update(Country country)
         {
             if (await this.CountryExists(country.Id) == true)
             {
                 _dbContext.Entry(country).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
-                return await this.RetrieveById(country.Id);
+                int rowsUpdated = await _dbContext.SaveChangesAsync();
+
+                Console.WriteLine($"[CountriesRepository][Update] => (rowsUpdated): '{rowsUpdated}'");
+
+                return country.Id;
             }
             else
             {
@@ -62,7 +64,7 @@ namespace HotelListing.Data.Repositories
             }
         }
 
-        private async Task<bool> CountryExists(int id)
+        public async Task<bool> CountryExists(int id)
         {
             return await _dbContext.Countries.AnyAsync(e => e.Id == id);
         }
