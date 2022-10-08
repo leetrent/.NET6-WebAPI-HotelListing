@@ -1,4 +1,5 @@
-﻿using HotelListing.Identity.Entities;
+﻿using HotelListing.Identity.Config;
+using HotelListing.Identity.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,10 @@ namespace HotelListing.Data.Config
     {
         public HotelListingIdentityDBContext(DbContextOptions<HotelListingIdentityDBContext> options) : base(options) { }
 
-        //public DbSet<ApiUser> ApiUsers { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new RoleConfig());
+        }
     }
 }
