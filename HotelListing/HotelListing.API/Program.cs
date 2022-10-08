@@ -1,18 +1,28 @@
 using HotelListing.Data.Config;
 using HotelListing.Data.Repositories;
 using HotelListing.Data.Repositories.Interfaces;
+using HotelListing.Identity.Entities;
 using HotelListing.Services;
 using HotelListing.Services.Config;
 using HotelListing.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-var connectionString = builder.Configuration.GetConnectionString("HotelListingDbConnectionString");
+string connectionString = builder.Configuration.GetConnectionString("HotelListingDbConnectionString");
+string identittyConnectionString = builder.Configuration.GetConnectionString("HotelListingIdentityDbConnectionString");
+
+// DOMAIN DB CONTEXT
 builder.Services.AddDbContext<HotelListingDBContext>(options => {
     options.UseSqlServer(connectionString);
+});
+
+// IDENTITY DB CONTEXT
+builder.Services.AddDbContext<HotelListingIdentityDBContext>(options => {
+    options.UseSqlServer(identittyConnectionString);
 });
 
 // ADD REPOSITORIES TO THE CONTAINER
@@ -24,6 +34,8 @@ builder.Services.AddScoped<IHotelsRepository, HotelsRepository>();
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IHotelsService, HotelsService>();
 
+// IDENTITY CORE
+builder.Services.AddIdentityCore<ApiUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<HotelListingDBContext>();
 
 
 builder.Services.AddControllers();
