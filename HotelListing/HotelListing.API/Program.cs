@@ -1,7 +1,9 @@
 using HotelListing.Data.Config;
 using HotelListing.Data.Repositories;
 using HotelListing.Data.Repositories.Interfaces;
+using HotelListing.Identity.Config;
 using HotelListing.Identity.Entities;
+using HotelListing.Identity.Managers;
 using HotelListing.Services;
 using HotelListing.Services.Config;
 using HotelListing.Services.Interfaces;
@@ -34,9 +36,15 @@ builder.Services.AddScoped<IHotelsRepository, HotelsRepository>();
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IHotelsService, HotelsService>();
 
-// IDENTITY CORE
-builder.Services.AddIdentityCore<ApiUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<HotelListingDBContext>();
+// ADD MANAGERS TO THE CONTAINER
+builder.Services.AddScoped<IAuthManager, AuthManager>();
 
+// ADD AUTO-MAPPER CONFIGURATIONS TO the CONTAINER
+builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
+builder.Services.AddAutoMapper(typeof(IdentityAutoMapperConfig));
+
+// ADD IDENTITY CORE
+builder.Services.AddIdentityCore<ApiUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<HotelListingIdentityDBContext>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -51,7 +59,6 @@ builder.Services.AddCors(options =>
 // (ctx) = HostBuilderContext; (lc) = LoggerConfiguration
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 
-builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 
 var app = builder.Build();
 

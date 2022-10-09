@@ -7,9 +7,9 @@ namespace HotelListing.Data.Config
 {
     public class HotelListingIdentityDBContext : IdentityDbContext<ApiUser>
     {
-        public HotelListingIdentityDBContext(DbContextOptions<HotelListingIdentityDBContext> options) : base(options) { }
+        public HotelListingIdentityDBContext(DbContextOptions<HotelListingIdentityDBContext> options) : base(options) {}
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new RoleConfig());

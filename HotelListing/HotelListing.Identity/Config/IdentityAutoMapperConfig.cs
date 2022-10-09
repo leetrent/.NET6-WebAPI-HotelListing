@@ -4,9 +4,9 @@ using HotelListing.Identity.Entities;
 
 namespace HotelListing.Identity.Config
 {
-    public class AutoMapperConfig : Profile
+    public class IdentityAutoMapperConfig : Profile
     {
-        public AutoMapperConfig()
+        public IdentityAutoMapperConfig()
         {
             CreateMap<ApiUser, UserDTO>().ReverseMap();
         }
