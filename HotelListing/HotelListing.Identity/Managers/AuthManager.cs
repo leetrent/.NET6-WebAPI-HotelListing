@@ -31,5 +31,18 @@ namespace HotelListing.Identity.Managers
             result = await _userManager.AddToRoleAsync(entity, RoleEnums.User.ToString());
             return result.Errors;
         }
+
+        public async Task<bool> Login(LoginDTO loginDTO)
+        {
+            bool authenticatedUser = false;
+
+            ApiUser apiUser = await _userManager.FindByEmailAsync(loginDTO.Email);
+            if (apiUser != null)
+            {
+                authenticatedUser = await _userManager.CheckPasswordAsync(apiUser, loginDTO.Password);
+            }          
+
+            return authenticatedUser;
+        }
     }
 }

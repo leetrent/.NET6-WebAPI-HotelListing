@@ -49,5 +49,34 @@ namespace HotelListing.API.Controllers
                 return Problem("An unexpected error occurred on our end.");
             }
         }
+
+        // POST: api/Account/login
+        [HttpPost]
+        [Route("login")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> Login([FromBody] LoginDTO loginDTO)
+        {
+            try
+            {
+                bool authenticatedUser = await _authManager.Login(loginDTO);
+
+                if (authenticatedUser)
+                {
+                    return Ok();
+                }
+                return Unauthorized();
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine();
+                Console.WriteLine(exc.Message);
+                Console.WriteLine();
+                Console.WriteLine(exc.StackTrace);
+                Console.WriteLine();
+                return Problem("An unexpected error occurred on our end.");
+            }
+        }
     }
 }
