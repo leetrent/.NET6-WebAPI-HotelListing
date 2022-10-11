@@ -3,17 +3,25 @@ using HotelListing.Identity.DTOs;
 using HotelListing.Identity.Entities;
 using HotelListing.Identity.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace HotelListing.Identity.Managers
 {
     public class AuthManager : IAuthManager
     {
         private readonly UserManager<ApiUser> _userManager;
+        private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
-        public AuthManager(UserManager<ApiUser> userManager, IMapper mapper)
+        public AuthManager(UserManager<ApiUser> userManager, IConfiguration configuration, IMapper mapper)
         {
             _userManager = userManager;
+            _configuration = configuration;
             _mapper = mapper;
         }
 
@@ -32,17 +40,63 @@ namespace HotelListing.Identity.Managers
             return result.Errors;
         }
 
-        public async Task<bool> Login(LoginDTO loginDTO)
+        public async Task<AuthResponseDTO?> Login(LoginDTO loginDTO)
         {
-            bool authenticatedUser = false;
-
             ApiUser apiUser = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (apiUser != null)
             {
-                authenticatedUser = await _userManager.CheckPasswordAsync(apiUser, loginDTO.Password);
-            }          
+                bool userIsAuthenticated = await _userManager.CheckPasswordAsync(apiUser, loginDTO.Password);
 
-            return authenticatedUser;
+                if (userIsAuthenticated)
+                {
+                    string securityToken = await this.generateToken(apiUser);
+                    return new AuthResponseDTO
+                    {
+                        UserId = apiUser.Id,
+                        Token = securityToken,
+                    };
+                }
+            }
+            return null;
+        }
+
+        private async Task<string> generateToken(ApiUser apiUser)
+        {
+            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
+            SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            IList<Claim> userClaims = await _userManager.GetClaimsAsync(apiUser);
+            IList<string> userRoles = await _userManager.GetRolesAsync(apiUser);
+            IEnumerable<Claim> roleClaims = userRoles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
+
+            IList<Claim> tokenClaims = new List<Claim>()
+            {
+                new Claim("uid", apiUser.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, apiUser.Email),
+                new Claim(JwtRegisteredClaimNames.Email, apiUser.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            tokenClaims.Union(userClaims);
+            tokenClaims.Union(roleClaims);
+
+
+            string tokenIssuer = _configuration["JwtSettings:Issuer"];
+            string tokenAudience = _configuration["JwtSetting:Audience"];
+            string durationInMinutes = _configuration["JwtSetting:DurationInMinutes"];
+            int minutes = Convert.ToInt32(durationInMinutes);
+            DateTime tokenExpiration = DateTime.Now.AddMinutes(minutes);
+
+            JwtSecurityToken securityToken = new JwtSecurityToken
+            (
+                issuer: tokenIssuer,
+                audience: tokenAudience,
+                claims: tokenClaims,
+                expires: tokenExpiration,
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
     }
 }

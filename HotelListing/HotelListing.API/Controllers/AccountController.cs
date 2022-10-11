@@ -60,13 +60,12 @@ namespace HotelListing.API.Controllers
         {
             try
             {
-                bool authenticatedUser = await _authManager.Login(loginDTO);
-
-                if (authenticatedUser)
+                AuthResponseDTO? authReponse = await _authManager.Login(loginDTO);
+                if (authReponse == null)
                 {
-                    return Ok();
+                    return Unauthorized();
                 }
-                return Unauthorized();
+                return Ok(authReponse);
             }
             catch (Exception exc)
             {
