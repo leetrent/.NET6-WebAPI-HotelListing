@@ -80,11 +80,11 @@ namespace HotelListing.Identity.Managers
             //tokenClaims.Union(userClaims);
             //tokenClaims.Union(roleClaims);
 
-            var roles = await _userManager.GetRolesAsync(apiUser);
-            var roleClaims = roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
-            var userClaims = await _userManager.GetClaimsAsync(apiUser);
+            IList<string> roles = await _userManager.GetRolesAsync(apiUser);
+            List<Claim> roleClaims = roles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
+            IList<Claim> userClaims = await _userManager.GetClaimsAsync(apiUser);
 
-            var tokenClaims = new List<Claim>
+            IEnumerable<Claim> tokenClaims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, apiUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
