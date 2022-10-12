@@ -65,25 +65,37 @@ namespace HotelListing.Identity.Managers
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
             SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            IList<Claim> userClaims = await _userManager.GetClaimsAsync(apiUser);
-            IList<string> userRoles = await _userManager.GetRolesAsync(apiUser);
-            IEnumerable<Claim> roleClaims = userRoles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
+            //IList<Claim> userClaims = await _userManager.GetClaimsAsync(apiUser);
+            //IList<string> userRoles = await _userManager.GetRolesAsync(apiUser);
+            //IEnumerable<Claim> roleClaims = userRoles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
 
-            IList<Claim> tokenClaims = new List<Claim>()
+            //IList<Claim> tokenClaims = new List<Claim>()
+            //{
+            //    new Claim("uid", apiUser.Id),
+            //    new Claim(JwtRegisteredClaimNames.Sub, apiUser.Email),
+            //    new Claim(JwtRegisteredClaimNames.Email, apiUser.Email),
+            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            //};
+
+            //tokenClaims.Union(userClaims);
+            //tokenClaims.Union(roleClaims);
+
+            var roles = await _userManager.GetRolesAsync(apiUser);
+            var roleClaims = roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
+            var userClaims = await _userManager.GetClaimsAsync(apiUser);
+
+            var tokenClaims = new List<Claim>
             {
-                new Claim("uid", apiUser.Id),
                 new Claim(JwtRegisteredClaimNames.Sub, apiUser.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, apiUser.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            tokenClaims.Union(userClaims);
-            tokenClaims.Union(roleClaims);
+                new Claim("uid", apiUser.Id),
+            }.Union(userClaims).Union(roleClaims);
 
 
             string tokenIssuer = _configuration["JwtSettings:Issuer"];
-            string tokenAudience = _configuration["JwtSetting:Audience"];
-            string durationInMinutes = _configuration["JwtSetting:DurationInMinutes"];
+            string tokenAudience = _configuration["JwtSettings:Audience"];
+            string durationInMinutes = _configuration["JwtSettings:DurationInMinutes"];
             int minutes = Convert.ToInt32(durationInMinutes);
             DateTime tokenExpiration = DateTime.Now.AddMinutes(minutes);
 
