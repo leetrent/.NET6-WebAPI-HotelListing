@@ -1,5 +1,6 @@
 ﻿using HotelListing.Services.DTOs.Country;
 using HotelListing.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.API.Controllers
@@ -59,6 +60,7 @@ namespace HotelListing.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<ActionResult<CountryGetDTO>> PostCountry(CountryCreateDTO countryToAdd)
         {
             try
@@ -81,6 +83,7 @@ namespace HotelListing.API.Controllers
         // PUT: api/Countries/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> PutCountry(int id, CountryUpdateDTO countryToUpdate)
         {
             try
@@ -111,6 +114,7 @@ namespace HotelListing.API.Controllers
 
         // DELETE: api/Countries/5
         [HttpDelete("{id}")]
+        [Authorize (Roles="Administrator")]
         public async Task<IActionResult> DeleteCountry(int id)
         {
             try
