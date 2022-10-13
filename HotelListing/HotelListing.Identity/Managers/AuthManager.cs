@@ -62,36 +62,23 @@ namespace HotelListing.Identity.Managers
 
         private async Task<string> generateToken(ApiUser apiUser)
         {
+            string key = _configuration["JwtSettings:Key"];
+            Console.WriteLine($"(key): '{key}'");
+
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
             SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            //IList<Claim> userClaims = await _userManager.GetClaimsAsync(apiUser);
-            //IList<string> userRoles = await _userManager.GetRolesAsync(apiUser);
-            //IEnumerable<Claim> roleClaims = userRoles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
-
-            //IList<Claim> tokenClaims = new List<Claim>()
-            //{
-            //    new Claim("uid", apiUser.Id),
-            //    new Claim(JwtRegisteredClaimNames.Sub, apiUser.Email),
-            //    new Claim(JwtRegisteredClaimNames.Email, apiUser.Email),
-            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            //};
-
-            //tokenClaims.Union(userClaims);
-            //tokenClaims.Union(roleClaims);
-
-            IList<string> roles = await _userManager.GetRolesAsync(apiUser);
-            List<Claim> roleClaims = roles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
             IList<Claim> userClaims = await _userManager.GetClaimsAsync(apiUser);
-
+            IList<string> userRoles = await _userManager.GetRolesAsync(apiUser);
+            List<Claim> roleClaims = userRoles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
+            
             IEnumerable<Claim> tokenClaims = new List<Claim>
-            {
+            {               
+                new Claim("uid", apiUser.Id),
+                new Claim(JwtRegisteredClaimNames.Email, apiUser.Email),
                 new Claim(JwtRegisteredClaimNames.Sub, apiUser.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, apiUser.Email),
-                new Claim("uid", apiUser.Id),
             }.Union(userClaims).Union(roleClaims);
-
 
             string tokenIssuer = _configuration["JwtSettings:Issuer"];
             string tokenAudience = _configuration["JwtSettings:Audience"];
