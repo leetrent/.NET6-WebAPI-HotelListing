@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace HotelListing.Identity.DTOs
 {
-    public class AuthResponseDTO
+    public class TokenDTO
     {
-        public string UserId { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
-        public string RefreshToken { get; set; } = string.Empty;
     }
 }

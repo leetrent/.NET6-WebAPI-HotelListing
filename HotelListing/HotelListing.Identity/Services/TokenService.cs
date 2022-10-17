@@ -1,64 +1,26 @@
-﻿using AutoMapper;
-using HotelListing.Identity.Constants;
-using HotelListing.Identity.DTOs;
+﻿using HotelListing.Identity.Constants;
 using HotelListing.Identity.Entities;
-using HotelListing.Identity.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace HotelListing.Identity.Managers
+namespace HotelListing.Identity.Services
 {
-    public class AuthManager : IAuthManager
+    public class TokenService : ITokenService
     {
         private readonly UserManager<ApiUser> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper;
 
-        public AuthManager(UserManager<ApiUser> userManager, IConfiguration configuration, IMapper mapper)
+        public TokenService(UserManager<ApiUser> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<IdentityError>> RegisterUser(UserDTO dto)
-        {
-            ApiUser entity = _mapper.Map<ApiUser>(dto);
-            entity.UserName = dto.Email;
-
-            IdentityResult result = await _userManager.CreateAsync(entity, dto.Password);
-            if (result.Succeeded == false)
-            {
-                return result.Errors;
-            }
-
-            result = await _userManager.AddToRoleAsync(entity, RoleEnums.User.ToString());
-            return result.Errors;
-        }
-
-        public async Task<string?> Login(LoginDTO loginDTO)
-        {
-            ApiUser apiUser = await _userManager.FindByEmailAsync(loginDTO.Email);
-            if (apiUser != null)
-            {
-                bool userIsAuthenticated = await _userManager.CheckPasswordAsync(apiUser, loginDTO.Password);
-                if (userIsAuthenticated)
-                {
-                    string securityToken = await this.generateToken(apiUser);
-                    Console.WriteLine($"[AuthManager][Login] (securityToken): '{securityToken}'");
-                    return securityToken;
-        
-                }
-            }
-            return null;
-        }
-
-        private async Task<string> generateToken(ApiUser apiUser)
+        public async Task<string> CreateNewToken(ApiUser apiUser)
         {
             string key = _configuration["JwtSettings:Key"];
             Console.WriteLine($"(key): '{key}'");
@@ -69,9 +31,9 @@ namespace HotelListing.Identity.Managers
             IList<Claim> userClaims = await _userManager.GetClaimsAsync(apiUser);
             IList<string> userRoles = await _userManager.GetRolesAsync(apiUser);
             List<Claim> roleClaims = userRoles.Select(rc => new Claim(ClaimTypes.Role, rc)).ToList();
-            
+
             IEnumerable<Claim> tokenClaims = new List<Claim>
-            {               
+            {
                 new Claim("uid", apiUser.Id),
                 new Claim(JwtRegisteredClaimNames.Email, apiUser.Email),
                 new Claim(JwtRegisteredClaimNames.Sub, apiUser.Email),
@@ -96,39 +58,39 @@ namespace HotelListing.Identity.Managers
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
 
-        private async Task<string> CreateRefreshToken(ApiUser apiUser)
+        public async Task<string> CreateRefreshToken(ApiUser apiUser)
         {
+            string logSnippet = "[TokenService][CreateRefreshToken] =>";
+
             await _userManager.RemoveAuthenticationTokenAsync(apiUser, ProjectConstants.LoginProvider, ProjectConstants.TokenName);
             string newToken = await _userManager.GenerateUserTokenAsync(apiUser, ProjectConstants.TokenProvider, ProjectConstants.Purpose);
+            Console.WriteLine($"{logSnippet} (newToken)........: '{newToken}'");
+
             IdentityResult result = await _userManager.SetAuthenticationTokenAsync(apiUser, ProjectConstants.LoginProvider, ProjectConstants.TokenName, newToken);
-             return newToken;
+            Console.WriteLine($"{logSnippet} (result.Succeeded): '{result.Succeeded}'");
+
+
+            return newToken;
         }
 
-        public async Task<string?> RefreshToken(string oldToken)
+        public async Task<ApiUser?> FindUser(string token)
         {
-            Console.WriteLine($"[AuthManager][RefreshToken] (newToken): '{oldToken}'");
+            string logSnippet = "[TokenService][FindUser] =>";
+            Console.WriteLine($"{logSnippet} (token): '{token}'");
 
             JwtSecurityTokenHandler tokenHandler = new();
-            JwtSecurityToken securityToken = tokenHandler.ReadJwtToken(oldToken);
+            JwtSecurityToken securityToken = tokenHandler.ReadJwtToken(token);
 
-            // Extract ApiUser from old token
+            // EXTRACT ApiUser FROM TOKEN
             IEnumerable<Claim> claimsEnumerable = securityToken.Claims;
             List<Claim> claimsList = claimsEnumerable.ToList();
             Claim? claim = claimsList.FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email);
             string? userName = claim?.Value;
+            Console.WriteLine($"{logSnippet} (userName): '{userName}'");
 
             ApiUser apiUser = await _userManager.FindByNameAsync(userName);
-            Console.WriteLine($"[AuthManager][RefreshToken] (apiUser == null): '{apiUser == null}'");
-            if (apiUser == null)
-            {
-                return null;
-            }
-
-            await _userManager.UpdateSecurityStampAsync(apiUser);
-            string newToken = await this.CreateRefreshToken(apiUser);
-            Console.WriteLine($"[AuthManager][RefreshToken] (newToken): '{newToken}'");
-            return newToken;
-
+            Console.WriteLine($"{logSnippet} (apiUser == null): '{apiUser == null}'");
+            return apiUser;
         }
     }
 }

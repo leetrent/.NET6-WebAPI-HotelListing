@@ -2,8 +2,10 @@ using HotelListing.Data.Config;
 using HotelListing.Data.Repositories;
 using HotelListing.Data.Repositories.Interfaces;
 using HotelListing.Identity.Config;
+using HotelListing.Identity.Constants;
 using HotelListing.Identity.Entities;
 using HotelListing.Identity.Managers;
+using HotelListing.Identity.Services;
 using HotelListing.Services;
 using HotelListing.Services.Config;
 using HotelListing.Services.Interfaces;
@@ -38,16 +40,19 @@ builder.Services.AddScoped<IHotelsRepository, HotelsRepository>();
 // ADD SERVICES TO THE CONTAINER
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IHotelsService, HotelsService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
-// ADD MANAGERS TO THE CONTAINER
-builder.Services.AddScoped<IAuthManager, AuthManager>();
 
 // ADD AUTO-MAPPER CONFIGURATIONS TO the CONTAINER
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 builder.Services.AddAutoMapper(typeof(IdentityAutoMapperConfig));
 
 // ADD IDENTITY CORE
-builder.Services.AddIdentityCore<ApiUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<HotelListingIdentityDBContext>();
+builder.Services.AddIdentityCore<ApiUser>()
+    .AddRoles<IdentityRole>()
+    .AddTokenProvider<DataProtectorTokenProvider<ApiUser>>(ProjectConstants.TokenProvider)
+    .AddEntityFrameworkStores<HotelListingIdentityDBContext>();
 
 // JWT AUTHENTICATION
 builder.Services.AddAuthentication 

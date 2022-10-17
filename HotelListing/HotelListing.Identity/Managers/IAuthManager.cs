@@ -11,6 +11,7 @@ namespace HotelListing.Identity.Managers
     public interface IAuthManager
     {
         Task<IEnumerable<IdentityError>> RegisterUser(UserDTO userDTO);
-        Task<AuthResponseDTO?> Login(LoginDTO loginDTO);
+        Task<string?> Login(LoginDTO loginDTO);
+        Task<string?> RefreshToken(string oldToken);
     }
 }
