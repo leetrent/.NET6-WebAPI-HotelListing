@@ -70,10 +70,15 @@ namespace HotelListing.Identity.Services
                 return null;
             }
 
-            string newToken = await _tokenService.CreateRefreshToken(apiUser);
+            string? newToken = await _tokenService.CreateRefreshToken(apiUser);
             Console.WriteLine($"[AuthManager][RefreshToken] (newToken): '{newToken}'");
 
-            return new TokenDTO { Token = newToken };
+            if (newToken != null)
+            {
+                return new TokenDTO { Token = newToken };
+            }
+
+            return null;
         }
     }
 }

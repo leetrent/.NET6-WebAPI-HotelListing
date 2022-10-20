@@ -10,7 +10,7 @@ namespace HotelListing.Identity.Services
     public interface ITokenService
     {
         Task<string> CreateNewToken(ApiUser apiUser);
-        Task<string> CreateRefreshToken(ApiUser apiUser);
+        Task<string?> CreateRefreshToken(ApiUser apiUser);
         Task<ApiUser?> FindUser(string token);
     }
 }

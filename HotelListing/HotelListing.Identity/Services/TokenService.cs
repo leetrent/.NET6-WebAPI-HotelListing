@@ -58,19 +58,25 @@ namespace HotelListing.Identity.Services
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
 
-        public async Task<string> CreateRefreshToken(ApiUser apiUser)
+        public async Task<string?> CreateRefreshToken(ApiUser apiUser)
         {
             string logSnippet = "[TokenService][CreateRefreshToken] =>";
 
             await _userManager.RemoveAuthenticationTokenAsync(apiUser, ProjectConstants.LoginProvider, ProjectConstants.TokenName);
-            string newToken = await _userManager.GenerateUserTokenAsync(apiUser, ProjectConstants.TokenProvider, ProjectConstants.Purpose);
+
+            //string newToken = await _userManager.GenerateUserTokenAsync(apiUser, ProjectConstants.TokenProvider, ProjectConstants.Purpose);
+            string newToken = await this.CreateNewToken(apiUser);
             Console.WriteLine($"{logSnippet} (newToken)........: '{newToken}'");
 
             IdentityResult result = await _userManager.SetAuthenticationTokenAsync(apiUser, ProjectConstants.LoginProvider, ProjectConstants.TokenName, newToken);
             Console.WriteLine($"{logSnippet} (result.Succeeded): '{result.Succeeded}'");
 
+            if (result.Succeeded)
+            {
+                return newToken;
+            }
 
-            return newToken;
+            return null;          
         }
 
         public async Task<ApiUser?> FindUser(string token)
