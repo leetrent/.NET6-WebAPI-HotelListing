@@ -4,7 +4,6 @@ using HotelListing.Data.Repositories.Interfaces;
 using HotelListing.Identity.Config;
 using HotelListing.Identity.Constants;
 using HotelListing.Identity.Entities;
-using HotelListing.Identity.Managers;
 using HotelListing.Identity.Services;
 using HotelListing.Services;
 using HotelListing.Services.Config;
@@ -23,12 +22,14 @@ string connectionString = builder.Configuration.GetConnectionString("HotelListin
 string identittyConnectionString = builder.Configuration.GetConnectionString("HotelListingIdentityDbConnectionString");
 
 // DOMAIN DB CONTEXT
-builder.Services.AddDbContext<HotelListingDBContext>(options => {
+builder.Services.AddDbContext<HotelListingDBContext>(options =>
+{
     options.UseSqlServer(connectionString);
 });
 
 // IDENTITY DB CONTEXT
-builder.Services.AddDbContext<HotelListingIdentityDBContext>(options => {
+builder.Services.AddDbContext<HotelListingIdentityDBContext>(options =>
+{
     options.UseSqlServer(identittyConnectionString);
 });
 
@@ -55,9 +56,9 @@ builder.Services.AddIdentityCore<ApiUser>()
     .AddEntityFrameworkStores<HotelListingIdentityDBContext>();
 
 // JWT AUTHENTICATION
-builder.Services.AddAuthentication 
+builder.Services.AddAuthentication
 (
-    options => 
+    options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

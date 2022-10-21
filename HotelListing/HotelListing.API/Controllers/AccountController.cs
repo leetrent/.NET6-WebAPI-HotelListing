@@ -1,10 +1,7 @@
 ﻿using HotelListing.Identity.DTOs;
-using HotelListing.Identity.Managers;
 using HotelListing.Identity.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace HotelListing.API.Controllers
 {
@@ -57,7 +54,7 @@ namespace HotelListing.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-         public async Task<ActionResult> Login([FromBody] LoginDTO loginDTO)
+        public async Task<ActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             try
             {
