@@ -5,11 +5,8 @@ namespace HotelListing.Data.Config
 {
     public class HotelListingDBContext : DbContext
     {
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        // NOT NEEDED (SO FAR)
         public HotelListingDBContext(DbContextOptions<HotelListingDBContext> options): base(options) {}
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  
         public DbSet<Country> Countries { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
 
